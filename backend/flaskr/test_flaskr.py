@@ -79,29 +79,51 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertTrue(len(data["categories"]))
 
-    # def test_delete_question(self):
-    #     """Tests question deletion success"""
-    #     with self.app.app_context():
-    #         res = self.client().delete("/questions/11")
-    #         data = json.loads(res.data)
+    def test_get_categories_failure(self):
+        """Tests getting questions by category failure 400"""
+        res = self.client().get('/categories')
+        data = json.loads(res.data)
 
-    #         question = Question.query.filter(Question.id == 11).one_or_none()
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
 
-    #         self.assertEqual(res.status_code, 200)
-    #         self.assertEqual(data["success"], True)
-    #         self.assertEqual(data["deleted"], 11)
-    #         self.assertEqual(question, None)
+    def test_delete_question(self):
+        """Tests question deletion success"""
+        with self.app.app_context():
+            res = self.client().delete("/questions/11")
+            data = json.loads(res.data)
+
+            question = Question.query.filter(Question.id == 11).one_or_none()
+
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(data["success"], True)
+            self.assertEqual(data["deleted"], 11)
+            self.assertEqual(question, None)
+
+
+    def test_delete_question_failure(self):
+        """Tests question deletion failure"""
+        with self.app.app_context():
+            res = self.client().delete("/questions/1000")
+            data = json.loads(res.data)
+
+            question = Question.query.filter(Question.id == 11).one_or_none()
+
+            # self.assertEqual(res.status_code, 200)
+            self.assertEqual(data["success"], False)
+            
 
     
-    # def test_create_question(self):
-    #     """Tests question creation success"""
-    #     res = self.client().post("/questions", json=self.new_question)
-    #     data = json.loads(res.data)
+    def test_create_question(self):
+        """Tests question creation success"""
+        res = self.client().post("/questions", json=self.new_question)
+        data = json.loads(res.data)
 
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertEqual(data["success"], True)
-    #     self.assertTrue(data["created_question"])
-    #     self.assertTrue(len(data["questions"]))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["created_question"])
+        self.assertTrue(len(data["questions"]))
 
 
     def test_422_if_question_creation_fails(self):
@@ -162,6 +184,17 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
         self.assertNotEqual(data['question']['id'],9)
+
+
+    def test_get_random_quiz_ques_failure(self):
+        '''Tests failure of getting random questions for playing the quiz'''
+        res = self.client().post("/quizzes", json = {"previous_questions":[5,9,23], "quiz_category":"ZZZ"})
+        data = json.loads(res.data)
+
+        # self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], False)
+        # self.assertTrue(data['question'])
+        # self.assertNotEqual(data['question']['id'],9)
 
 
 
