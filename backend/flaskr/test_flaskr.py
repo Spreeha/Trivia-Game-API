@@ -81,12 +81,12 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_get_categories_failure(self):
         """Tests getting questions by category failure 400"""
-        res = self.client().get('/categories')
+        res = self.client().get('/categories/3')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'bad request')
+        self.assertEqual(data['message'], 'resource not found')
 
     def test_delete_question(self):
         """Tests question deletion success"""
@@ -188,11 +188,12 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_get_random_quiz_ques_failure(self):
         '''Tests failure of getting random questions for playing the quiz'''
-        res = self.client().post("/quizzes", json = {"previous_questions":[5,9,23], "quiz_category":"ZZZ"})
+        res = self.client().post("/quizzes", json = {})
         data = json.loads(res.data)
 
-        # self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
         # self.assertTrue(data['question'])
         # self.assertNotEqual(data['question']['id'],9)
 
